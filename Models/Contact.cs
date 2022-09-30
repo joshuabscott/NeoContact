@@ -23,7 +23,7 @@ namespace NeoContact.Models
 
         #region FullName
         [NotMapped]
-        public string? FullName { get { return $"{FullName} {LastName}"; } }
+        public string? FullName { get { return $"{FirstName} {LastName}"; } }
         #endregion
 
         [Display(Name = "Birthday")]
