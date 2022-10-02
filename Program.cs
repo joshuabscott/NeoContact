@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NeoContact.Data;
 using NeoContact.Models;
+using NeoContact.Services;
+using NeoContact.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+//ADD SERVICES
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IAddressBookService, AddressBookService>();
 
 var app = builder.Build();
 

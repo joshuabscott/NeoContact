@@ -28,7 +28,7 @@ namespace NeoContact.Models
 
         [Display(Name = "Birthday")]
         [DataType(DataType.Date)]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         [Required]
         public string? Address1 { get; set; }
