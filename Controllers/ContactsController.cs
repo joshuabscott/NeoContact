@@ -39,7 +39,23 @@ namespace NeoContact.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Contacts.Include(c => c.AppUser);
+            //MODIFY
+            //var applicationDbContext = _context.Contacts.Include(c => c.AppUser);
+            List<Contact> contacts = new List<Contact>();
+            string appUserId = _userManager.GetUserId(User);
+            //return the userId and its associated contacts & categories
+            AppUser appUser = _context.Users
+                                       .Include(c => c.Contacts)
+                                       .ThenInclude(c => c.Categories)
+                                       .FirstOrDefault(u => u.Id == appUserId);
+
+            var categories = appUser.Categories;
+
+            contacts = appUser.Contacts.OrderBy(c => c.LastName)
+                                       .ThenBy(c => c.FirstName)
+                                       .ToList();
+            ViewData["CateforyId"] = new SelectList(categories, "Id", "Name");
+
             return View(await applicationDbContext.ToListAsync());
         }
 
