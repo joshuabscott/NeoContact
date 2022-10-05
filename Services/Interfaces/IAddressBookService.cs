@@ -16,6 +16,5 @@ namespace NeoContact.Services.Interfaces
         Task RemoveContactFromCategoryAsync(int categoryId, int contactId);
         
         IEnumerable<Contact> SerchForContacts(string searchString, string userId);
-
     }
 }

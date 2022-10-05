@@ -1,6 +1,7 @@
-﻿using NeoContact.Enums;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NeoContact.Enums;
 
 namespace NeoContact.Models
 {

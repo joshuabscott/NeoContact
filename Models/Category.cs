@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeoContact.Models
 {
     public class Category
     {
         public int Id { get; set; }
+
         [Required]
         public string? AppUserId { get; set; }
         

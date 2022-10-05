@@ -6,7 +6,7 @@ namespace NeoContact.Services
     public class ImageService : IImageService
     {
         //ADD
-        private readonly string[] suffices = {"Bytes", "KB", "MB", "GB", "TB", "PB"};
+        private readonly string[] suffixes = {"Bytes", "KB", "MB", "GB", "TB", "PB"};
         private readonly string defaultImage = "img/DefaultContactImage.png";
 
         public string ConvertByteArrayToFile(byte[] fileData, string extention)
@@ -16,7 +16,7 @@ namespace NeoContact.Services
             try
             {
                 string imageBase64Data = Convert.ToBase64String(fileData);
-                return string.Format($"data:{extention}base64,{imageBase64Data}");
+                return string.Format($"data:{extention};base64,{imageBase64Data}");
             }
             catch (Exception)
             {

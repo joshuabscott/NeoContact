@@ -9,16 +9,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using NeoContact.Data;
 using NeoContact.Models;
+using NeoContact.Services;
+using NeoContact.Services.Interfaces;
 
 namespace NeoContact.Controllers
 {
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        //ADD
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IImageService _imageService;
+        private readonly IAddressBookService _addressBookService;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context,
+                                    UserManager<AppUser> userManager,
+                                    IImageService imageService,
+                                    IAddressBookService addressBookService)
         {
             _context = context;
+            //ADD
+            _userManager = userManager;
+            _imageService = imageService;
+            _addressBookService = addressBookService;
         }
 
         // GET: Categories

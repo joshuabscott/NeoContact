@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NeoContact.Services
 {
-    public class AddressBookService : IAddressBookService
+        public class AddressBookService : IAddressBookService
     {
         private readonly ApplicationDbContext _context;
 
@@ -54,12 +54,11 @@ namespace NeoContact.Services
         {
             //MODIFY   GetUserCategoriesAsync
             List<Category> categories = new List<Category>();
-            //throw new NotImplementedException();
             try
             {
                 categories = await _context.Categories.Where(c => c.AppUserId == userId)
                                                       .OrderBy(c => c.Name)
-                                                    .ToListAsync();
+                                                      .ToListAsync();
             }
             catch
             {

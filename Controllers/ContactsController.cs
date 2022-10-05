@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using NeoContact.Data;
 using NeoContact.Models;
 using NeoContact.Enums;
+using NeoContact.Services;
 using NeoContact.Services.Interfaces;
 
 namespace NeoContact.Controllers
@@ -44,7 +45,7 @@ namespace NeoContact.Controllers
             List<Contact> contacts = new List<Contact>();
             string appUserId = _userManager.GetUserId(User);
             //return the userId and its associated contacts & categories
-            AppUser appUser = _context.Users
+            AppUser appUser =  _context.Users
                                        .Include(c => c.Contacts)
                                        .ThenInclude(c => c.Categories)
                                        .FirstOrDefault(u => u.Id == appUserId);
@@ -56,7 +57,8 @@ namespace NeoContact.Controllers
                                        .ToList();
             ViewData["CateforyId"] = new SelectList(categories, "Id", "Name");
 
-            return View(await applicationDbContext.ToListAsync());
+            //return View(await applicationDbContext.ToListAsync());
+            return View(contacts);
         }
 
         // GET: Contacts/Details/5
@@ -85,10 +87,9 @@ namespace NeoContact.Controllers
         {
             //CHANGE
             string appUserId = _userManager.GetUserId(User);
-            //ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id");
             //ADD
             ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
-            ViewData["CategroryList"] = new MultiSelectList(await _addressBookService.GetUserCategoriesAsync(appUserId), "Id", "Name");
+            ViewData["CategoryList"] = new MultiSelectList(await _addressBookService.GetUserCategoriesAsync(appUserId), "Id", "Name");
             return View();
         }
 
@@ -128,8 +129,7 @@ namespace NeoContact.Controllers
                     await _addressBookService.AddContactToCategoryAsync(categoryId, contact.Id);
                 }
                 //save each category selected to the contractcategories table
-                //
-
+                
                 return RedirectToAction(nameof(Index));
             }
 

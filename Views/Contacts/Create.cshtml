@@ -7,19 +7,15 @@
 <div class="p-3 border border-2 shadow-lg bg-light">
     <form asp-action="Create" asp-controller="Contacts" enctype="multipart/form-data">
         <div class="row g-3 p-2">
-            
             @*Col1*@
             <div class="col-12 col-lg-4">
                 <div class="square-img-container">
                     <img id="contactImage" class="square-img" src="~/img/DefaultContactImage.png">
                 </div>
                 <div class="mt-2">
-                    <input asp-for="formFile" class="form-control" accept=".png,.jpg,.jpeg,.gif" onchange ="document.getElementById('contactImage').src = window.URL.createObjectURL(this.files[0])"/>
+                    <input asp-for="formFile" class="form-control" accept=".png,.jpg,.jpeg,.gif" 
+                    onchange ="document.getElementById('contactImage').src = window.URL.createObjectURL(this.files[0])"/>
                     <span asp-validation-for="formFile" class="text-danger"></span>
-                </div>
-
-                <div class="col-12 col-lg-12 d-flex justify-content-center mt-2">
-                    <button type="submit" class="btu btn-lg btn-primary rounded-pill">Save</button>
                 </div>
             </div>
 
@@ -73,19 +69,17 @@
                     </div>
                     <div class="col-12 col-lg-6 mt-3">
                         <label asp-for="Categories" class="control-label"></label>
-                        <select name="CategoryList" class="form-control" asp-items="ViewBag.CategoryList" multiple />
+                        <select name="CategoryList" class="form-control" asp-items="ViewBag.CategoryList" multiple></select>
                     </div>
-                    @*<div class="col-12 col-lg-6 mt-3">
-                        <label asp-for="Categories" class="control-label"></label>
-                        <select name="CategoryList" class="form-control" asp-items="ViewBag.CategoryList" multiple />
-                    </div>*@
-
+                    
                     <div class="col-12 col-lg-6 mt-3">
                         <label asp-for="Date" class="control-label"></label>
                         <input asp-for="Date" class="form-control" />
                         <span asp-validation-for="Date" class="text-danger"></span>
                     </div>
-                    
+                    <div class="col-12 d-flex justify-content-end mt-2">
+                        <button type="submit" class="btu btn-lg btn-primary rounded-pill">Save</button>
+                    </div>
                 </div>
             </div>
         </div>

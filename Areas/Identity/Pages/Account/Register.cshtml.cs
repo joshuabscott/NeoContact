@@ -71,11 +71,12 @@ namespace NeoContact.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            /// ADD
             [Required]
             [Display(Name = "First Name")]
             [StringLength(50, ErrorMessage = "The {0} must be at lest {2} and a max {1} charactors long.",MinimumLength =2)]
             public string FirstName { get; set; }
-
+            /// ADD
             [Required]
             [Display(Name = "Last Name")]
             [StringLength(50, ErrorMessage = "The {0} must be at lest {2} and a max {1} charactors long.",MinimumLength =2)]
@@ -118,6 +119,7 @@ namespace NeoContact.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            /// MODIFY
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
@@ -168,6 +170,7 @@ namespace NeoContact.Areas.Identity.Pages.Account
         {
             try
             {
+                /// MODIFY
                 AppUser user = Activator.CreateInstance<AppUser>();
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
