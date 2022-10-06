@@ -188,12 +188,20 @@ namespace NeoContact.Controllers
                 return NotFound();
             }
 
-            var contact = await _context.Contacts.FindAsync(id);
+            //ADD Lesson #29 Edit Contact View for Security Issues - Adding States
+            string appUserId = _userManager.GetUserId(User);
+            //MODIFY
+            //var contact = await _context.Contacts.FindAsync(id);
+            var contact = await _context.Contacts.Where(c => c.Id == id && c.AppUserID == appUserId)
+                                        .FirstOrDefaultAsync();         
             if (contact == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserID);
+            //REMOVE
+            //ViewData["AppUserID"] = new SelectList(_context.Users, "Id", "Id", contact.AppUserID);
+            ViewData["StatesList"] = new SelectList(Enum.GetValues(typeof(States)).Cast<States>().ToList());
+            ViewData["CategoryList"] = new MultiSelectList(await _addressBookService.GetUserCategoriesAsync(appUserId), "Id", "Name", await _addressBookService.GetContactCategoryIdsAsync(contact.Id));
             return View(contact);
         }
 
@@ -202,7 +210,7 @@ namespace NeoContact.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserID,FirstName,LastName,Date,Address1,Address2,City,State,Zip,Email,PhoneNumber,Created,ImageData,ImageType")] Contact contact)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserID,FirstName,LastName,Date,Address1,Address2,City,State,Zip,Email,PhoneNumber,Created,formFile,ImageData,ImageType")] Contact contact)
         {
             if (id != contact.Id)
             {
@@ -213,6 +221,21 @@ namespace NeoContact.Controllers
             {
                 try
                 {
+                    //ADD Lesson #31 Edit Contact View - Saving Dates
+                    contact.Created = DateTime.SpecifyKind(contact.Created, DateTimeKind.Utc);
+
+                    if(contact.Date != null)
+                    {
+                        contact.Date = DateTime.SpecifyKind(contact.Date.Value, DateTimeKind.Utc);
+                    }
+
+                    //ADD Lesson #32 Edit Contact View - Saving Images
+                    if (contact.formFile != null)
+                    {
+                        contact.ImageData = await _imageService.ConvertFileToByteArrayAsync(contact.formFile);
+                        contact.ImageType = contact.formFile.ContentType;
+                    }
+
                     _context.Update(contact);
                     await _context.SaveChangesAsync();
                 }
