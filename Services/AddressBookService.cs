@@ -2,6 +2,7 @@
 using NeoContact.Models;
 using NeoContact.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace NeoContact.Services
 {
@@ -40,9 +41,18 @@ namespace NeoContact.Services
             }
         }
 
-        public Task<ICollection<Category>> GetContactCategoriesAsync(int contactId)
+        public async Task<ICollection<Category>> GetContactCategoriesAsync(int contactId)
         {
-            throw new NotImplementedException();
+            //ADD Lesson #33 Edit Contact View - Saving Categories
+            try
+            {
+                Contact? contact = await _context.Contacts.Include(c => c.Categories).FirstOrDefaultAsync();
+                return contact.Categories;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<ICollection<int>> GetContactCategoryIdsAsync(int contactId)
@@ -82,21 +92,36 @@ namespace NeoContact.Services
 
         public async Task<bool> IsContactInCategory(int categoryId, int contactId)
         {
-            //MODIFY     IsContactInCategory
+            //MODIFY  Lesson#27?   IsContactInCategory
             Contact? contact = await _context.Contacts.FindAsync(contactId);
 
             return await _context.Categories
-                .Include(c => c.Contacts)
-                .Where(c => c.Id == categoryId && c.Contacts.Contains(contact!))
-                .AnyAsync();
-            //throw new NotImplementedException();
-
-
+                                .Include(c => c.Contacts)
+                                .Where(c => c.Id == categoryId && c.Contacts.Contains(contact!))
+                                .AnyAsync();
         }
 
-        public Task RemoveContactFromCategoryAsync(int categoryId, int contactId)
+        public async Task RemoveContactFromCategoryAsync(int categoryId, int contactId)
         {
-            throw new NotImplementedException();
+            //MODIFY  Lesson# 33 Edit Contact View - Saving Categories
+            try
+            {
+                if (await IsContactInCategory(categoryId, contactId))
+                {
+                    Contact contact = await _context.Contacts.FindAsync(contactId);
+                    Category category = await _context.Categories.FindAsync(contactId);
+
+                    if (category != null && contact != null)
+                    {
+                        category.Contacts.Remove(contact);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public IEnumerable<Contact> SerchForContacts(string searchString, string userId)

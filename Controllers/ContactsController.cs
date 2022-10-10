@@ -11,8 +11,11 @@ using Microsoft.AspNetCore.Authorization;
 using NeoContact.Data;
 using NeoContact.Models;
 using NeoContact.Enums;
+using NeoContact.Models.ViewModels;
 using NeoContact.Services;
 using NeoContact.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace NeoContact.Controllers
 {
@@ -23,23 +26,28 @@ namespace NeoContact.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
         private readonly IAddressBookService _addressBookService;
+        private readonly IEmailSender _emailService;
+
         //MODIFY
-        public ContactsController(ApplicationDbContext context, 
-                                    UserManager<AppUser> userManager, 
+        public ContactsController(ApplicationDbContext context,
+                                    UserManager<AppUser> userManager,
                                     IImageService imageService,
-                                    IAddressBookService addressBookService)
+                                    IAddressBookService addressBookService,
+                                    IEmailSender emailService)
         {
             _context = context;
             //ADD
             _userManager = userManager;
             _imageService = imageService;
             _addressBookService = addressBookService;
+            _emailService = emailService;
         }
 
         // GET: Contacts
         [Authorize]
-        public async Task<IActionResult> Index(int categoryId)
+        public async Task<IActionResult> Index(int categoryId, string swalMessage = null)
         {
+            ViewData["SwalMessage"] = swalMessage;
             //MODIFY
             List<Contact> contacts = new List<Contact>();
             string appUserId = _userManager.GetUserId(User);
@@ -59,7 +67,7 @@ namespace NeoContact.Controllers
                     .ThenBy(c => c.FirstName)
                     .ToList();
             }
-           else
+            else
             {
                 contacts = appUser.Categories.FirstOrDefault(c => c.Id == categoryId)
                                   .Contacts
@@ -84,8 +92,8 @@ namespace NeoContact.Controllers
                                       .Include(c => c.Contacts)
                                       .ThenInclude(c => c.Categories)
                                       .FirstOrDefault(u => u.Id == appUserId);
-           
-            if(String.IsNullOrEmpty(searchString))
+
+            if (String.IsNullOrEmpty(searchString))
             {
                 contacts = appUser.Contacts
                                   .OrderBy(c => c.LastName)
@@ -95,13 +103,64 @@ namespace NeoContact.Controllers
             }
             else
             {
-                contacts = appUser.Contacts.Where( c => c.FullName!.ToLower().Contains(searchString.ToLower()) )
+                contacts = appUser.Contacts.Where(c => c.FullName!.ToLower().Contains(searchString.ToLower()))
                                   .OrderBy(c => c.LastName)
                                   .ThenBy(c => c.FirstName)
                                   .ToList();
             }
             ViewData["CategoryId"] = new SelectList(appUser.Categories, "Id", "Name", 0);
             return View(nameof(Index), contacts);
+        }
+
+        //ADD Lesson #35 Emailing Contact - Creating The View
+        [Authorize]
+        public async Task<IActionResult> EmailContact(int id)
+        {
+            //ADD Lesson #36 Email Contact - Creating The View Models
+            string appUserId = _userManager.GetUserId(User);
+            Contact contact = await _context.Contacts.Where(c => c.Id == id && c.AppUserID == appUserId)
+                                                     .FirstOrDefaultAsync();
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            EmailData emailData = new EmailData()
+            {
+                EmailAddress = contact.Email,
+                FirstName = contact.FirstName,
+                LastName = contact.LastName,
+
+            };
+
+            EmailContactViewModel model = new EmailContactViewModel()
+            {
+                Contact = contact,
+                EmailData = emailData,
+            };
+
+            return View(model);
+        }
+
+        //ADD Lesson #41 Email Contact - Sending Emails
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> EmailContact(EmailContactViewModel ecvm)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(ecvm.EmailData.EmailAddress, ecvm.EmailData.Subject, ecvm.EmailData.Body);
+                    return RedirectToAction("Index", "Contacts", new {swalMessage = "Success: Email Sent!"});
+                }
+                catch
+                {
+                    return RedirectToAction("Index", "Contacts", new { swalMessage = "Error: Email Send Failed!"});
+                    throw;
+                }
+            }
+            return View(ecvm);
         }
 
         // GET: Contacts/Details/5
@@ -172,7 +231,7 @@ namespace NeoContact.Controllers
                     await _addressBookService.AddContactToCategoryAsync(categoryId, contact.Id);
                 }
                 //save each category selected to the contractcategories table
-                
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -193,7 +252,7 @@ namespace NeoContact.Controllers
             //MODIFY
             //var contact = await _context.Contacts.FindAsync(id);
             var contact = await _context.Contacts.Where(c => c.Id == id && c.AppUserID == appUserId)
-                                        .FirstOrDefaultAsync();         
+                                        .FirstOrDefaultAsync();
             if (contact == null)
             {
                 return NotFound();
@@ -210,7 +269,7 @@ namespace NeoContact.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserID,FirstName,LastName,Date,Address1,Address2,City,State,Zip,Email,PhoneNumber,Created,formFile,ImageData,ImageType")] Contact contact)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserID,FirstName,LastName,Date,Address1,Address2,City,State,Zip,Email,PhoneNumber,Created,formFile,ImageData,ImageType")] Contact contact, List<int> CategoryList) //ADD Lesson#33 Edit Contact View - Saving Categories
         {
             if (id != contact.Id)
             {
@@ -224,7 +283,7 @@ namespace NeoContact.Controllers
                     //ADD Lesson #31 Edit Contact View - Saving Dates
                     contact.Created = DateTime.SpecifyKind(contact.Created, DateTimeKind.Utc);
 
-                    if(contact.Date != null)
+                    if (contact.Date != null)
                     {
                         contact.Date = DateTime.SpecifyKind(contact.Date.Value, DateTimeKind.Utc);
                     }
@@ -238,6 +297,20 @@ namespace NeoContact.Controllers
 
                     _context.Update(contact);
                     await _context.SaveChangesAsync();
+
+                    //ADD Lesson #33 Edit Contact View - Saving Categories
+                    //remove the current categories
+                    List<Category> oldCategories = (await _addressBookService.GetContactCategoriesAsync(contact.Id)).ToList();
+                    foreach (var category in oldCategories)
+                    {
+                        await _addressBookService.RemoveContactFromCategoryAsync(category.Id, contact.Id);
+                    }
+                    //add the selected categories
+                    foreach (int categoryid in CategoryList)
+                    {
+                        await _addressBookService.AddContactToCategoryAsync(categoryid, contact.Id);
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -264,15 +337,14 @@ namespace NeoContact.Controllers
             {
                 return NotFound();
             }
-
+            //MODIFY Lesson #42 Email Contact - Fix Delete View
+            string appUserId = _userManager.GetUserId(User);
             var contact = await _context.Contacts
-                .Include(c => c.AppUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                .FirstOrDefaultAsync(c => c.Id == id && c.AppUserID == appUserId);
             if (contact == null)
             {
                 return NotFound();
             }
-
             return View(contact);
         }
 
@@ -281,23 +353,20 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Contacts == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Contacts'  is null.");
-            }
-            var contact = await _context.Contacts.FindAsync(id);
+            //MODIFY Lesson #42 Email Contact - Fix Delete View
+            string appUserId = _userManager.GetUserId(User);
+            var contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Id == id && c.AppUserID == appUserId);
             if (contact != null)
             {
                 _context.Contacts.Remove(contact);
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ContactExists(int id)
         {
-          return _context.Contacts.Any(e => e.Id == id);
+            return _context.Contacts.Any(e => e.Id == id);
         }
     }
 }
