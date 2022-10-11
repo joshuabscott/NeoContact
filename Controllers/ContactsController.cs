@@ -135,7 +135,7 @@ namespace NeoContact.Controllers
 
             EmailContactViewModel model = new EmailContactViewModel()
             {
-                Contact = contact,
+                Contacts = contact,
                 EmailData = emailData,
             };
 

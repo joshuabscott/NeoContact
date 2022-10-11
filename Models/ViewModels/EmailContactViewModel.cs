@@ -3,7 +3,7 @@
     public class EmailContactViewModel
     {
         //ADD Lesson #36 Email Contact - Creating The View Models
-        public Contact? Contact { get; set; }
+        public Contact? Contacts { get; set; }
         public EmailData? EmailData { get; set; }
     }
 }

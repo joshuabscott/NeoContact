@@ -11,6 +11,9 @@ using NeoContact.Data;
 using NeoContact.Models;
 using NeoContact.Services;
 using NeoContact.Services.Interfaces;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Security.Cryptography.X509Certificates;
+using NeoContact.Models.ViewModels;
 
 namespace NeoContact.Controllers
 {
@@ -21,25 +24,59 @@ namespace NeoContact.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IImageService _imageService;
         private readonly IAddressBookService _addressBookService;
+        private readonly IEmailSender _emailService;
 
         public CategoriesController(ApplicationDbContext context,
                                     UserManager<AppUser> userManager,
                                     IImageService imageService,
-                                    IAddressBookService addressBookService)
+                                    IAddressBookService addressBookService,
+                                    IEmailSender emailService)
         {
             _context = context;
             //ADD
             _userManager = userManager;
             _imageService = imageService;
             _addressBookService = addressBookService;
+            _emailService = emailService;
         }
 
         // GET: Categories
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Categories.Include(c => c.AppUser);
-            return View(await applicationDbContext.ToListAsync());
+            //MODIFY Lesson #43 Category Index View
+            string appUserId = _userManager.GetUserId(User);
+            var categories = await _context.Categories.Where(c => c.AppUserId == appUserId)
+                                                      .Include(c => c.AppUser)
+                                                      .ToListAsync();
+            return View(categories);
+        }
+
+        //ADD Lesson #47 Category Edit - Email Category GET Action
+        // Email Category
+        [Authorize]
+        public async Task<IActionResult> EmailCategory(int? id)
+        {
+            string appUserId = _userManager.GetUserId(User);
+
+            Category category = await _context.Categories
+                                     .Include(c => c.Contacts)
+                                     .FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
+            List<string> emails = category.Contacts.Select(c => c.Email).ToList();
+
+            EmailData emailData = new EmailData()
+            {
+                GroupName = category.Name,
+                EmailAddress = String.Join(";", emails),
+                Subject = $"Group Message: {category.Name}"
+            };
+
+            EmailCategoryViewModel model = new EmailCategoryViewModel()
+            {
+                Contacts = category.Contacts.ToList(),
+                EmailData = emailData
+            };
+            return View(model);
         }
 
         // GET: Categories/Details/5
@@ -66,7 +103,6 @@ namespace NeoContact.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -77,13 +113,18 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AppUserId,Name")] Category category)
         {
+            //MODIFY Lesson #46 Category Edit - Create
+            ModelState.Remove("AppUserId");
+
             if (ModelState.IsValid)
             {
+                string appUserId = _userManager.GetUserId(User);
+                category.AppUserId = appUserId;
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
             return View(category);
         }
 
@@ -91,17 +132,20 @@ namespace NeoContact.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Categories == null)
+            //MODIFY Lesson #44 Category Edit - Edit View / GET Action
+            if (id == null )
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
+            string appUserId = _userManager.GetUserId(User);
+
+            var category = await _context.Categories.Where(c => c.Id == id && c.AppUserId == appUserId)
+                                                    .FirstOrDefaultAsync();
             if (category == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
             return View(category);
         }
 
@@ -112,15 +156,17 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,Name")] Category category)
         {
+            //MODIFY Lesson #45 Category Edit - POST Action
             if (id != category.Id)
             {
                 return NotFound();
             }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    string appUserId = _userManager.GetUserId(User);
+                    category.AppUserId = appUserId;
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -137,7 +183,6 @@ namespace NeoContact.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", category.AppUserId);
             return View(category);
         }
 
