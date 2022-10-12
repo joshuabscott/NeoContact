@@ -42,8 +42,11 @@ namespace NeoContact.Controllers
 
         // GET: Categories
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string swalMessage = null)
         {
+            //MODIFY Lesson #48 Category Edit - Email Category POST Action (Send Button)
+            ViewData["SwalMessage"] = swalMessage;
+
             //MODIFY Lesson #43 Category Index View
             string appUserId = _userManager.GetUserId(User);
             var categories = await _context.Categories.Where(c => c.AppUserId == appUserId)
@@ -52,7 +55,7 @@ namespace NeoContact.Controllers
             return View(categories);
         }
 
-        //ADD Lesson #47 Category Edit - Email Category GET Action
+        // GET: ADD Lesson #47 Category Edit - Email Category GET Action
         // Email Category
         [Authorize]
         public async Task<IActionResult> EmailCategory(int? id)
@@ -79,24 +82,25 @@ namespace NeoContact.Controllers
             return View(model);
         }
 
-        // GET: Categories/Details/5
+        // POST: ADD Lesson #48 Category Edit - Email Category POST Action (Send Button)
+        // Email Category
         [Authorize]
-        public async Task<IActionResult> Details(int? id)
+        [HttpPost]
+        public async Task<IActionResult> EmailCategory(EmailCategoryViewModel ecvm)
         {
-            if (id == null || _context.Categories == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                try { 
+                await _emailService.SendEmailAsync(ecvm.EmailData.EmailAddress, ecvm.EmailData.Subject, ecvm.EmailData.Body);
+                return RedirectToAction("Index", "Categories", new { swalMessage = "Success: Email Sent!" });
+                }
+                catch
+                {
+                    return RedirectToAction("Index", "Categories", new { swalMessage = "Error: Email Send Failed!" });
+                    throw;
+                }
             }
-
-            var category = await _context.Categories
-                .Include(c => c.AppUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
+            return View(ecvm);
         }
 
         // GET: Categories/Create
@@ -194,10 +198,10 @@ namespace NeoContact.Controllers
             {
                 return NotFound();
             }
-
+            // GET: ADD Lesson #49 Category Edit - Delete Category
+            string appUserId = _userManager.GetUserId(User);
             var category = await _context.Categories
-                .Include(c => c.AppUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                         .FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
             if (category == null)
             {
                 return NotFound();
@@ -211,17 +215,14 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Categories == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Categories'  is null.");
-            }
-            var category = await _context.Categories.FindAsync(id);
+            // POST: ADD Lesson #49 Category Edit - Delete Category
+            string appUserId = _userManager.GetUserId(User);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
             if (category != null)
             {
                 _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

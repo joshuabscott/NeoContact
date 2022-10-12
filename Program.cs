@@ -42,6 +42,8 @@ else
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/HandleError/{0}");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
