@@ -32,6 +32,11 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 
 var app = builder.Build();
 
+//ADD Lesson #56 Data Helper
+var scope = app.Services.CreateScope();
+//get database update with the latest migration
+await DataHelper.ManageDataAsync(scope.ServiceProvider);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
