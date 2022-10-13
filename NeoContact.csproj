@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-NeoContact-5B73B5A2-9FC5-4048-BB1B-198C3F3AA4BF</UserSecretsId>
+	<InvariantGlobalization>true</InvariantGlobalization>
+	 
   </PropertyGroup>
 
   <ItemGroup>
