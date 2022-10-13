@@ -23,6 +23,7 @@ namespace NeoContact.Controllers
             return View();
         }
 
+        //ADD Lesson #51 Custom Error Page
         [Route("/Home/HandleError/{code:int}")]
         public IActionResult HandleError(int code)
         {
@@ -36,7 +37,7 @@ namespace NeoContact.Controllers
             {
                 customError.message = "Sorry, something went wrong";
             }
-            return View("`/Views/Shared/CustomeError.cshtml", customError);
+            return View("~/Views/Shared/CustomError.cshtml", customError);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
