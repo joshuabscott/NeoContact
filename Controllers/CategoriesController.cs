@@ -14,7 +14,7 @@ using NeoContact.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Security.Cryptography.X509Certificates;
 using NeoContact.Models.ViewModels;
-
+//ADD Lesson #10 Scaffolding Models
 namespace NeoContact.Controllers
 {
     public class CategoriesController : Controller

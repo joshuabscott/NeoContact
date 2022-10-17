@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
+@* ADD Lesson #14 Securing Contacts *@
 @inject SignInManager<AppUser> SignInManager
 
 <!DOCTYPE html>
@@ -33,6 +34,7 @@
 <body>
     <header>
         <!-- New NVA BAR -->
+        <!-- ADD Lesson #11 Template Navigation Bar -->
         <nav class="navbar navbar-expand-md navbar-light fixed-top border-bottom border-light navShadow">
         <div class="container-fluid">
             
@@ -47,6 +49,7 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
+                    @* ADD Lesson #14 Securing Contacts *@
                     @if (SignInManager.IsSignedIn(User))
                     {
                     <li class="nav-item">
@@ -60,17 +63,12 @@
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
                 </ul>
-             
                 <partial name="_LoginPartial" />
-
             </div>
         </div>
     </nav>
         <!-- END NVA BAR -->
-
-      
     </header>
-
 
     <div class="content" id="mainHero">
         <section class="container  h-100">
@@ -78,6 +76,7 @@
         </section>
     </div>
 
+    <!-- ADD Lesson #12 Adding The Footer -->
     <footer class="footer container-fluid">
         <div class="row align-items-center py-2">
             <div class="col">

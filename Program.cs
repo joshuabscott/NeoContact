@@ -10,8 +10,13 @@ using NeoContact.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//Lesson #04 PostgreSQL Database Setup
 //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+//ADD Lesson #04 PostgreSQL Database Setup
 //var connectionString = builder.Configuration.GetSection("pgSettings")["pgConnection"];
+
+//UPDATE Lesson #55 Connection Helper (Local vs Production)
 var connectionString = ConnectionHelper.GetConnectionstring(builder.Configuration);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

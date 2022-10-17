@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NeoContact.Enums;
-
+//ADD Lesson #09 Building Models
 namespace NeoContact.Models
 {
     public class Contact

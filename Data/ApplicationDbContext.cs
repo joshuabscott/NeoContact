@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NeoContact.Models;
-
+//ADD Lesson #06 Extending Identity
 namespace NeoContact.Data
 {
     public class ApplicationDbContext : IdentityDbContext<AppUser>

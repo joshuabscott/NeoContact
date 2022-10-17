@@ -16,7 +16,7 @@ using NeoContact.Services;
 using NeoContact.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity.UI.Services;
-
+//ADD Lesson #10 Scaffolding Models
 namespace NeoContact.Controllers
 {
     public class ContactsController : Controller
@@ -44,6 +44,7 @@ namespace NeoContact.Controllers
         }
 
         // GET: Contacts
+        //MODIFY Lesson #14 Securing Contacts to ensure Loged in status
         [Authorize]
         public async Task<IActionResult> Index(int categoryId, string swalMessage = null)
         {

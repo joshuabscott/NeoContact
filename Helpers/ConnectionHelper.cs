@@ -9,7 +9,6 @@ namespace NeoContact.Helpers
         {
             var connectionString = configuration.GetSection("pgSettings")["pgConnection"];
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-
             return string.IsNullOrEmpty(databaseUrl) ? connectionString : BuildConnectionString(databaseUrl);
         }
 
