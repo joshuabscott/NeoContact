@@ -1,6 +1,6 @@
 ﻿using Npgsql;
 
-//ADD Lesson #55 Connection Helper (Local vs Production)
+//ADD #55 Connection Helper (Local vs Production)
 namespace NeoContact.Helpers
 {
     public static class ConnectionHelper

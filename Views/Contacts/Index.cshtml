@@ -25,9 +25,10 @@
             <div class="mt-5">
                 <label class="form-label fw-bold">CATEGORY FILTER</label>
 
+                @* //ADD #24\25 Binding Categories / CategoryId*@
                 <select name="categoryId" asp-items="@ViewBag.CategoryId" class="form-control"
                         onchange="this.form.submit()" onfocus="this.selectedIndex=-1;this.blur();">
-                    <option>All Contacts</option>
+                    <option><strong>All Contacts</strong></option>
                 </select>
             </div>
         </form>

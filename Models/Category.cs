@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-//ADD Lesson #09 Building Models
+//ADD #09 Building Models
 namespace NeoContact.Models
 {
     public class Category

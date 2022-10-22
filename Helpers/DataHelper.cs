@@ -1,7 +1,7 @@
 ﻿using NeoContact.Data;
 using Microsoft.EntityFrameworkCore;
 
-//ADD Lesson #56 Data Helper
+//ADD #56 Data Helper
 namespace NeoContact.Helpers
 {
     public static class DataHelper

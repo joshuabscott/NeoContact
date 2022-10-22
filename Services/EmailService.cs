@@ -22,10 +22,19 @@ namespace NeoContact.Services
         {
             //MODIFY Lesson #57 Email Service Cleanup
             var emailSender = _mailSettings.Email ?? Environment.GetEnvironmentVariable("Email");
+            //MOVE Oct 22
+            //MODIFY Lesson #57 Email Service Cleanup
+            var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
+            var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port")!);
+            var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
 
             MimeMessage newEmail = new();
             newEmail.Sender = MailboxAddress.Parse(emailSender);
-            foreach(var emailAddress in email.Split(';'))
+            //ADD Oct 22
+            newEmail.To.Add(MailboxAddress.Parse(email));
+            newEmail.Subject = subject;
+
+            foreach (var emailAddress in email.Split(';'))
             {
                 newEmail.To.Add(MailboxAddress.Parse(emailAddress));
             }
@@ -37,14 +46,11 @@ namespace NeoContact.Services
 
             newEmail.Body = emailbody.ToMessageBody();
 
-            //at this point log into smtp client
-            using SmtpClient smtpClient = new();
+            //Send the email
             try
             {
-                //MODIFY Lesson #57 Email Service Cleanup
-                var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
-                var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port")!);
-                var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
+                //at this point log into smtp client
+                using SmtpClient smtpClient = new();
 
                 await smtpClient.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await smtpClient.AuthenticateAsync(emailSender,password);

@@ -15,15 +15,17 @@ namespace NeoContact.Services
             _context = context;
         }
 
+        //MODIFY #21 Saving Contact Categories
         public async Task AddContactToCategoryAsync(int categoryId, int contactId)
         {
-            //MODIFY    AddContactToCategoryAsync
+            //MODIFY #21 Saving Contact Categories
             try
             //throw new NotImplementedException();
             {
-                //check to see if the categor is in the contact
+                //check to see if the category is in the contact
                 if (!await IsContactInCategory(categoryId, contactId))
                 {
+                    // Using Virtual Properties???
                     Contact? contact = await _context.Contacts.FindAsync(categoryId);
                     Category? category = await _context.Categories.FindAsync(contactId);
 
@@ -32,7 +34,6 @@ namespace NeoContact.Services
                         category.Contacts.Add(contact);
                         await _context.SaveChangesAsync();
                     }
-
                 }
             }
             catch (Exception)
@@ -71,30 +72,29 @@ namespace NeoContact.Services
             }
         }
 
+        //MODIFY #20 Binding Categories
         public async Task<IEnumerable<Category>> GetUserCategoriesAsync(string userId)
         {
-            //MODIFY   GetUserCategoriesAsync
+            //MODIFY #20 Binding Categories / ContactsController GET: Contacts/Create
             List<Category> categories = new List<Category>();
             try
-            {
+            { // Link statment that is filtered    // This is an => Arrow Function || Categories = c
                 categories = await _context.Categories.Where(c => c.AppUserId == userId)
-                                                      .OrderBy(c => c.Name)
+                                                      .OrderBy(c => c.Name) //.OrderBy is ascending order
                                                       .ToListAsync();
             }
             catch
             {
                 throw;
             }
-
             return categories;
-
         }
 
+        //MODIFY #21 Saving Contact Categories
         public async Task<bool> IsContactInCategory(int categoryId, int contactId)
         {
-            //MODIFY  Lesson#27?   IsContactInCategory
+            //MODIFY #21 Saving Contact Categories
             Contact? contact = await _context.Contacts.FindAsync(contactId);
-
             return await _context.Categories
                                 .Include(c => c.Contacts)
                                 .Where(c => c.Id == categoryId && c.Contacts.Contains(contact!))

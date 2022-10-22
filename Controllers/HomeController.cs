@@ -23,7 +23,7 @@ namespace NeoContact.Controllers
             return View();
         }
 
-        //ADD Lesson #51 Custom Error Page
+        //ADD #51 Custom Error Page
         [Route("/Home/HandleError/{code:int}")]
         public IActionResult HandleError(int code)
         {

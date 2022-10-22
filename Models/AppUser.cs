@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-//ADD Lesson #06 Extending Identity
+//ADD #06 Extending Identity
 namespace NeoContact.Models
 {
     public class AppUser : IdentityUser

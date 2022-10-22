@@ -14,7 +14,7 @@ using NeoContact.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Security.Cryptography.X509Certificates;
 using NeoContact.Models.ViewModels;
-//ADD Lesson #10 Scaffolding Models
+//ADD #10 Scaffolding Models
 namespace NeoContact.Controllers
 {
     public class CategoriesController : Controller
@@ -44,10 +44,10 @@ namespace NeoContact.Controllers
         [Authorize]
         public async Task<IActionResult> Index(string swalMessage = null)
         {
-            //MODIFY Lesson #48 Category Edit - Email Category POST Action (Send Button)
+            //MODIFY #48 Category Edit - Email Category POST Action (Send Button)
             ViewData["SwalMessage"] = swalMessage;
 
-            //MODIFY Lesson #43 Category Index View
+            //MODIFY #43 Category Index View
             string appUserId = _userManager.GetUserId(User);
             var categories = await _context.Categories.Where(c => c.AppUserId == appUserId)
                                                       .Include(c => c.AppUser)
@@ -55,7 +55,7 @@ namespace NeoContact.Controllers
             return View(categories);
         }
 
-        // GET: ADD Lesson #47 Category Edit - Email Category GET Action
+        // GET: ADD #47 Category Edit - Email Category GET Action
         // Email Category
         [Authorize]
         public async Task<IActionResult> EmailCategory(int? id)
@@ -82,7 +82,7 @@ namespace NeoContact.Controllers
             return View(model);
         }
 
-        // POST: ADD Lesson #48 Category Edit - Email Category POST Action (Send Button)
+        // POST: ADD #48 Category Edit - Email Category POST Action (Send Button)
         // Email Category
         [Authorize]
         [HttpPost]
@@ -117,7 +117,7 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AppUserId,Name")] Category category)
         {
-            //MODIFY Lesson #46 Category Edit - Create
+            //MODIFY #46 Category Edit - Create
             ModelState.Remove("AppUserId");
 
             if (ModelState.IsValid)
@@ -136,7 +136,7 @@ namespace NeoContact.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            //MODIFY Lesson #44 Category Edit - Edit View / GET Action
+            //MODIFY #44 Category Edit - Edit View / GET Action
             if (id == null )
             {
                 return NotFound();
@@ -160,7 +160,7 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AppUserId,Name")] Category category)
         {
-            //MODIFY Lesson #45 Category Edit - POST Action
+            //MODIFY #45 Category Edit - POST Action
             if (id != category.Id)
             {
                 return NotFound();
@@ -198,7 +198,7 @@ namespace NeoContact.Controllers
             {
                 return NotFound();
             }
-            // GET: ADD Lesson #49 Category Edit - Delete Category
+            // GET: ADD #49 Category Edit - Delete Category
             string appUserId = _userManager.GetUserId(User);
             var category = await _context.Categories
                                          .FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
@@ -215,7 +215,7 @@ namespace NeoContact.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // POST: ADD Lesson #49 Category Edit - Delete Category
+            // POST: ADD #49 Category Edit - Delete Category
             string appUserId = _userManager.GetUserId(User);
             var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.AppUserId == appUserId);
             if (category != null)
