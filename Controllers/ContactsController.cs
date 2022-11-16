@@ -129,7 +129,6 @@ namespace NeoContact.Controllers
                 EmailAddress = contact.Email,
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
-
             };
 
             EmailContactViewModel model = new EmailContactViewModel()
