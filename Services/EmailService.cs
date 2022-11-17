@@ -7,7 +7,7 @@ using MailKit.Security;
 
 namespace NeoContact.Services
 {
-    //ADD Lesson #40 Email Contact - Building The Mail Service
+    //ADD #40 Email Contact - Building The Mail Service
     public class EmailService : IEmailSender
 
     {
@@ -20,40 +20,34 @@ namespace NeoContact.Services
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            //MODIFY Lesson #57 Email Service Cleanup
+            //MODIFY #57 Email Service Cleanup
             var emailSender = _mailSettings.Email ?? Environment.GetEnvironmentVariable("Email");
-            //MOVE Oct 22
-            //MODIFY Lesson #57 Email Service Cleanup
-            var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
-            var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port")!);
-            var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
-
+            
             MimeMessage newEmail = new();
             newEmail.Sender = MailboxAddress.Parse(emailSender);
-            //ADD Oct 22
-            newEmail.To.Add(MailboxAddress.Parse(email));
-            newEmail.Subject = subject;
 
             foreach (var emailAddress in email.Split(';'))
             {
                 newEmail.To.Add(MailboxAddress.Parse(emailAddress));
             }
-
             newEmail.Subject = subject;
-
-            BodyBuilder emailbody = new ();
+            BodyBuilder emailbody = new();
             emailbody.HtmlBody = htmlMessage;
-
             newEmail.Body = emailbody.ToMessageBody();
 
-            //Send the email
+            //At this point log into smtp client
+            using SmtpClient smtpClient = new();
+
             try
             {
-                //at this point log into smtp client
-                using SmtpClient smtpClient = new();
+                //MODIFY #57 Email Service Cleanup
+                var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
+                var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port")!);
+                var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
 
                 await smtpClient.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await smtpClient.AuthenticateAsync(emailSender,password);
+
                 await smtpClient.SendAsync(newEmail);
                 await smtpClient.DisconnectAsync(true);
             }

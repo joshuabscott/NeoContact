@@ -51,7 +51,7 @@ namespace NeoContact.Controllers
             ViewData["SwalMessage"] = swalMessage;
 
             //ADD #24 Binding Categories
-            List<Contact> contacts = new List<Contact>();
+            var contacts = new List<Contact>();
             string appUserId = _userManager.GetUserId(User);
 
             //return the userId and its associated contacts & categories
@@ -59,6 +59,7 @@ namespace NeoContact.Controllers
                                        .Include(c => c.Contacts)
                                        .ThenInclude(c => c.Categories)
                                        .FirstOrDefault(u => u.Id == appUserId);
+            
             var categories = appUser.Categories;
             //MODIFY #25 Filter Contacts By Category
             if (categoryId == 0) {
@@ -112,6 +113,7 @@ namespace NeoContact.Controllers
         }
 
         //ADD #35 Emailing Contact - Creating The View
+        //GET
         [Authorize]
         public async Task<IActionResult> EmailContact(int id)
         {
@@ -133,7 +135,7 @@ namespace NeoContact.Controllers
 
             EmailContactViewModel model = new EmailContactViewModel()
             {
-                Contacts = contact,
+                Contact = contact,
                 EmailData = emailData,
             };
 
@@ -141,6 +143,7 @@ namespace NeoContact.Controllers
         }
 
         //ADD #41 Email Contact - Sending Emails
+        //POST
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> EmailContact(EmailContactViewModel ecvm)
@@ -361,7 +364,6 @@ namespace NeoContact.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
         private bool ContactExists(int id)
         {
             return _context.Contacts.Any(e => e.Id == id);
