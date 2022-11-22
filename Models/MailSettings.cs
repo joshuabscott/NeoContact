@@ -2,7 +2,7 @@
 {
     public class MailSettings
     {
-        //ADD Lesson #38 Email Contact - Adding The Mail Settings Model
+        //ADD #38 Email Contact - Adding The Mail Settings Model
         public string? Email { get; set; }
         public string? Password { get; set; }
         public string? DisplayName { get; set; }
