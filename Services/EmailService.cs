@@ -41,9 +41,9 @@ namespace NeoContact.Services
             try
             {
                 //MODIFY #57 Email Service Cleanup
-                var host = _mailSettings.Host ?? Environment.GetEnvironmentVariable("Host");
-                var port = _mailSettings.Port != 0 ? _mailSettings.Port : int.Parse(Environment.GetEnvironmentVariable("Port")!);
-                var password = _mailSettings.Password ?? Environment.GetEnvironmentVariable("Password");
+                var host = _mailSettings.EmailHost ?? Environment.GetEnvironmentVariable("EmailHost");
+                var port = _mailSettings.EmailPort != 0 ? _mailSettings.EmailPort : int.Parse(Environment.GetEnvironmentVariable("EmailPort")!);
+                var password = _mailSettings.EmailPassword ?? Environment.GetEnvironmentVariable("EmailPassword");
 
                 await smtpClient.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await smtpClient.AuthenticateAsync(emailSender,password);
