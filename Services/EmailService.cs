@@ -47,7 +47,6 @@ namespace NeoContact.Services
 
                 await smtpClient.ConnectAsync(host, port, SecureSocketOptions.StartTls);
                 await smtpClient.AuthenticateAsync(emailSender,password);
-
                 await smtpClient.SendAsync(newEmail);
                 await smtpClient.DisconnectAsync(true);
             }
