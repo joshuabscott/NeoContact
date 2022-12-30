@@ -12,7 +12,7 @@ namespace NeoContact.Helpers
             return string.IsNullOrEmpty(databaseUrl) ? connectionString : BuildConnectionString(databaseUrl);
         }
 
-        //buld a connection string from the enviroment. i.e Heroku
+        //buld a connection string from the enviroment. i.e Heroku / Railway
         private static string BuildConnectionString(string databaseUrl)
         {
             var databaseUri = new Uri(databaseUrl);
